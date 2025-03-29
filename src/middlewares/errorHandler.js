@@ -7,7 +7,6 @@ export const errorHandler = (err, _req, res, _next) => {
       message: err.message,
       data: err.details,
     });
-    return;
   }
 
   if (err instanceof HttpError) {
