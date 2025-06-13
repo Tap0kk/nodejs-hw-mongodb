@@ -1,64 +1,88 @@
-import { ONE_DAY } from '../constants/index.js';
-import {
-  loginUser,
-  refreshUser,
-  registerUser,
-  logoutUser,
-} from '../services/auth.js';
+import * as authService from '../services/auth.js';
+import createError from 'http-errors';
+import User from '../models/user.js';
+import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
+import bcrypt from 'bcryptjs';
+import transporter from '../utils/email.js'; 
 
-export const registerUserController = async (req, res) => {
-  const user = await registerUser(req.body);
-
-  res.status(201).json({
-    status: 201,
-    message: 'Successfully registered a user!',
-    data: user,
-  });
-};
-
-const setupSession = (res, session) => {
-  res.cookie('refreshToken', session.refreshToken, {
-    httpOnly: true,
-    expires: new Date(session.refreshTokenValidUntil),
-  });
-
-  res.cookie('sessionId', session._id, {
-    httpOnly: true,
-    expires: new Date(Date.now() + ONE_DAY),
-  });
-};
-
-export const loginUserController = async (req, res) => {
-  const session = await loginUser(req.body);
-
-  setupSession(res, session);
-  res.status(200).json({
-    status: 200,
-    message: 'Successfully logged in an user!',
-    data: { accessToken: session.accessToken },
-  });
-};
-
-export const refreshUserController = async (req, res) => {
-  const session = await refreshUser({
-    sessionId: req.cookies.sessionId,
-    refreshToken: req.cookies.refreshToken,
-  });
-
-  setupSession(res, session);
-  res.status(200).json({
-    status: 200,
-    message: 'Successfully refreshed a session!',
-    data: { accessToken: session.accessToken },
-  });
-};
-
-export const logoutUserController = async (req, res) => {
-  if (req.cookies.sessionId) {
-    await logoutUser(req.cookies.sessionId);
+export const register = async (req, res, next) => {
+  try {
+    const result = await authService.register(req.body);
+    res.status(201).json({
+      status: 201,
+      message: 'Successfully registered a user!',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
   }
-  res.clearCookie('sessionId');
-  res.clearCookie('refreshToken');
+};
 
-  res.status(204).send();
+export const login = async (req, res, next) => {
+  try {
+    const result = await authService.login(req.body, res);
+    res.status(200).json({
+      status: 200,
+      message: 'Successfully logged in an user!',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const refresh = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.cookies;
+    const result = await authService.refresh(refreshToken, res);
+    res.status(200).json({
+      status: 200,
+      message: 'Successfully refreshed a session!',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const logout = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.cookies;
+    await authService.logout(refreshToken);
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const sendResetEmail = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    await authService.sendResetEmail(email);
+
+    res.status(200).json({
+      status: 200,
+      message: 'Reset password email has been successfully sent.',
+      data: null,
+    });
+  } catch (error) {
+    console.error('Send reset email error:', error);
+    next(error);
+  }
+};
+
+export const resetPwd = async (req, res, next) => {
+  const { token, password } = req.body;
+
+  try {
+    await authService.resetPassword(token, password);
+    res.status(200).json({
+      status: 200,
+      message: 'Password has been successfully reset.',
+    });
+  } catch (error) {
+    next(error); 
+  }
 };
