@@ -1,40 +1,31 @@
 import express from 'express';
-import pino from 'pino-http';
+import morgan from 'morgan';
 import cors from 'cors';
-import 'dotenv/config';
-import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser'; 
+import contactsRouter from './routers/contacts.js';
+import errorHandler from './middlewares/errorHandler.js';
+import notFoundHandler from './middlewares/notFoundHandler.js';
+import authRouter from './routers/auth.js';
 
-import { getEnvVar } from './utils/getEnvVar.js';
+dotenv.config();
 
-import indexRouter from './routers/index.js';
+const app = express();
 
-import { errorHandler } from './middlewares/errorHandler.js';
-import { notFoundHandler } from './middlewares/notFoundHandler.js';
+app.use(morgan('dev'));
+app.use(cors());
+app.use(express.json());
+app.use(cookieParser());
+app.use('/contacts', contactsRouter);
+app.use('/auth', authRouter);
+app.use(notFoundHandler);
+app.use(errorHandler);
 
-export function setupServer() {
-  const PORT = Number(getEnvVar('PORT', '3000'));
-
-  const app = express();
-
-  app.use(cors());
-  app.use(express.json());
-  app.use(cookieParser());
-
-  app.use(
-    pino({
-      transport: {
-        target: 'pino-pretty',
-      },
-    }),
-  );
-
-  app.use(indexRouter);
-
-  app.use('*', notFoundHandler);
-
-  app.use(errorHandler);
-
+export const setupServer = () => {
+  const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`✅ Server is running on port ${PORT}`);
   });
-}
+};
+
+export default app;
