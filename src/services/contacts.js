@@ -8,22 +8,23 @@ export const getAllContacts = async ({
   sortOrder = SORT_ORDER.ASC,
   sortBy = '_id',
   filter = {},
+  userId,
 }) => {
   const limit = perPage;
   const skip = (page - 1) * perPage;
 
-  const contactsQuery = ContactCollection.find();
+  const query = { userId };
 
   if (filter.type) {
-    contactsQuery.where('contactType').equals(filter.type);
+    query.contactType = filter.type;
   }
   if (filter.isFavourite !== undefined) {
-    contactsQuery.where('isFavourite').equals(filter.isFavourite);
+    query.isFavourite = filter.isFavourite;
   }
 
   const [contactsCount, contacts] = await Promise.all([
-    ContactCollection.find().merge(contactsQuery).countDocuments(),
-    contactsQuery
+    ContactCollection.countDocuments(query),
+    ContactCollection.find(query)
       .skip(skip)
       .limit(limit)
       .sort({ [sortBy]: sortOrder })
@@ -38,21 +39,26 @@ export const getAllContacts = async ({
   };
 };
 
-export const getAllContactsByID = async (contactId) => {
-  return await ContactCollection.findById(contactId);
+export const getAllContactsByID = async (contactId, userId) => {
+  return await ContactCollection.findOne({ _id: contactId, userId });
 };
 
-export const createContact = async (payload) => {
-  return await ContactCollection.create(payload);
+export const createContact = async (payload, userId) => {
+  return await ContactCollection.create({ ...payload, userId });
 };
 
-export const deleteContact = async (contactId) => {
-  return await ContactCollection.findOneAndDelete({ _id: contactId });
+export const deleteContact = async (contactId, userId) => {
+  return await ContactCollection.findOneAndDelete({ _id: contactId, userId });
 };
 
-export const updateContact = async (contactId, payload, options = {}) => {
+export const updateContact = async (
+  contactId,
+  payload,
+  userId,
+  options = {},
+) => {
   const updatedContact = await ContactCollection.findOneAndUpdate(
-    { _id: contactId },
+    { _id: contactId, userId },
     payload,
     {
       new: true,
