@@ -1,18 +1,14 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
-import { initMongoConnection } from './db/initMongoConnection.js';
+// src/index.js
 import { setupServer } from './server.js';
+import { initMongoDB } from './db/initMongoConnection.js';
+import { createDirIfNotExists } from './utils/createDirIfNotExists.js';
+import { TEMP_UPLOAD_DIR, UPLOAD_DIR } from './constants/index.js';
 
-const start = async () => {
-  try {
-    console.log('🚀 Starting app...');
-    await initMongoConnection();
-    setupServer();
-  } catch (error) {
-    console.error('❌ Failed to start the app:', error.message);
-    process.exit(1);
-  }
+const bootstrap = async () => {
+  await initMongoDB();
+  await createDirIfNotExists(TEMP_UPLOAD_DIR);
+  await createDirIfNotExists(UPLOAD_DIR);
+  setupServer();
 };
 
-start();
+void bootstrap();
