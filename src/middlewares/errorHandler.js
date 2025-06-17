@@ -1,20 +1,11 @@
 import { HttpError } from 'http-errors';
 
-export const errorHandler = (err, _req, res, _next) => {
-  if (err.name === 'ValidationError') {
-    res.status(400).json({
-      status: 400,
-      message: err.message,
-      data: err.details,
-    });
-    return;
-  }
-
+export const errorHandler = (err, req, res, next) => {
   if (err instanceof HttpError) {
     res.status(err.status).json({
-      status: err.statusCode,
+      status: err.status,
       message: err.name,
-      data: err.message,
+      data: err,
     });
     return;
   }

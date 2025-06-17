@@ -1,22 +1,30 @@
-import { CONTACT_TYPES } from '../constants/index.js';
+const parseGender = (gender) => {
+  if (typeof gender !== 'string') return;
+  const allowedGenders = ['male', 'female', 'other'];
 
-const parseType = (type) => {
-  if (typeof type !== 'string') return;
-  if (CONTACT_TYPES.includes(type)) return type;
+  return allowedGenders.includes(gender) ? gender : undefined;
 };
 
-const parseIsFavourite = (isFavourite) => {
-  if (typeof isFavourite !== 'string') return;
-  if (isFavourite === 'true') return true;
-  if (isFavourite === 'false') return false;
+const parseBoolean = (value) => {
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return undefined;
 };
 
-export const parseFilterParams = ({ type, isFavourite }) => {
-  const parsedType = parseType(type);
-  const parsedIsFavourite = parseIsFavourite(isFavourite);
+const parseNumber = (value) => {
+  if (typeof value !== 'string') return;
+
+  const parsed = parseInt(value, 10);
+  return Number.isNaN(parsed) ? undefined : parsed;
+};
+
+export const parseFilterParams = (query) => {
+  const { gender, minAge, maxAge, favorite } = query;
 
   return {
-    type: parsedType,
-    isFavourite: parsedIsFavourite,
+    gender: parseGender(gender),
+    minAge: parseNumber(minAge),
+    maxAge: parseNumber(maxAge),
+    favorite: parseBoolean(favorite),
   };
 };
