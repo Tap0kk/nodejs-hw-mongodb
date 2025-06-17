@@ -5,7 +5,6 @@ import fs from 'node:fs/promises';
 
 import { getEnvVar } from './getEnvVar.js';
 
-
 cloudinary.v2.config({
   secure: true,
   cloud_name: getEnvVar('CLOUDINARY_CLOUD_NAME'),

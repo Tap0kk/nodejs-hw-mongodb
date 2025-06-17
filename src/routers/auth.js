@@ -1,18 +1,25 @@
 import { Router } from 'express';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
-import { registerUserSchema, loginUserSchema } from '../validation/auth.js';
+
 import {
   registerUserController,
   loginUserController,
   logoutUserController,
   refreshUserSessionController,
+  requestResetEmailController,
+  resetPasswordController,
+  getGoogleOAuthUrlController,
+  loginWithGoogleController,
 } from '../controllers/auth.js';
-import { validateBody } from '../middlewares/validateBody.js';
-import { requestResetEmailSchema } from '../validation/auth.js';
-import { requestResetEmailController } from '../controllers/auth.js';
-import { resetPasswordSchema } from '../validation/auth.js';
-import { resetPasswordController } from '../controllers/auth.js';
-import { upload } from '../middlewares/multer.js';
+
+import {
+  registerUserSchema,
+  loginUserSchema,
+  requestResetEmailSchema,
+  resetPasswordSchema,
+  loginWithGoogleOAuthSchema,
+} from '../validation/auth.js';
+
 import {
   createContactController,
   patchContactController,
@@ -21,9 +28,14 @@ import {
   createContactSchema,
   updateContactSchema,
 } from '../validation/contact.js';
+
+import { validateBody } from '../middlewares/validateBody.js';
 import { isValidId } from '../middlewares/isValidId.js';
+import { upload } from '../middlewares/multer.js';
+
 const router = Router();
 
+// Auth routes
 router.post(
   '/register',
   validateBody(registerUserSchema),
@@ -47,13 +59,13 @@ router.post(
   ctrlWrapper(resetPasswordController),
 );
 
+// Contact routes
 router.post(
   '/',
   upload.single('photo'),
   validateBody(createContactSchema),
   ctrlWrapper(createContactController),
 );
-
 router.patch(
   '/:contactId',
   isValidId,
@@ -61,4 +73,13 @@ router.patch(
   validateBody(updateContactSchema),
   ctrlWrapper(patchContactController),
 );
+
+// OAuth routes
+router.get('/get-oauth-url', ctrlWrapper(getGoogleOAuthUrlController));
+router.post(
+  '/confirm-oauth',
+  validateBody(loginWithGoogleOAuthSchema),
+  ctrlWrapper(loginWithGoogleController),
+);
+
 export default router;
