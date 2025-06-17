@@ -4,12 +4,10 @@ const contactSchema = new Schema(
   {
     name: {
       type: String,
-      required: true,
       trim: true,
     },
     phoneNumber: {
       type: String,
-      required: true,
       trim: true,
     },
     email: {
@@ -23,7 +21,6 @@ const contactSchema = new Schema(
     contactType: {
       type: String,
       enum: ['work', 'home', 'personal'],
-      required: true,
       default: 'personal',
     },
   },
