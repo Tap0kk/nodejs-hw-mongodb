@@ -64,7 +64,7 @@ export const setupServer = () => {
 
   // ==== 404 Middleware ====
   app.use('*', (req, res) => {
-    res.status(404).json({ message: '❌ Not found' });
+    res.status(404).json({ message: '❌ Not found!' });
   });
 
   // ==== Обробка помилок ====
