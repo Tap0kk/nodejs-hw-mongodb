@@ -1,100 +1,165 @@
-import createError from 'http-errors';
-import * as contactsService from '../services/contacts.js';
+import {
+  getAllContacts,
+  getAllContactsByID,
+  updateContact,
+  createContact,
+  deleteContact,
+} from '../services/contacts.js';
+import createHttpError from 'http-errors';
+import { parsePaginationParams } from '../utils/parsePaginationParams.js';
+import { parseSortParams } from '../utils/parseSortParams.js';
+import { parseFilterParams } from '../utils/parseFilterParams.js';
 import mongoose from 'mongoose';
+import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+import { getEnvVar } from '../utils/getEnvVar.js';
 
-export const getAllContacts = async (req, res) => {
-  const userId = req.user._id;
-  const { page = 1, perPage = 10, sortBy = 'name', sortOrder = 'asc', type, isFavourite } = req.query;
-  const filters = { userId };
+export const getContactsController = async (req, res, next) => {
+  try {
+    const { page, perPage } = parsePaginationParams(req.query);
+    const { sortBy, sortOrder } = parseSortParams(req.query);
+    const filter = parseFilterParams(req.query);
 
-  if (type) filters.contactType = type;
-  if (isFavourite !== undefined) filters.isFavourite = isFavourite === 'true';
+    const userId = req.user._id;
 
-  const contacts = await contactsService.listContacts(
-    filters,
-    {
-      page: Number(page),
-      perPage: Number(perPage),
+    const contacts = await getAllContacts({
+      page,
+      perPage,
       sortBy,
       sortOrder,
+      filter,
+      userId,
+    });
+
+    res.json({
+      status: 200,
+      message: 'Successfully found contacts!',
+      data: contacts,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getContactByIdController = async (req, res, next) => {
+  try {
+    const { contactId } = req.params;
+    const userId = req.user._id;
+
+    if (!mongoose.Types.ObjectId.isValid(contactId)) {
+      throw createHttpError(400, 'Invalid contact ID');
     }
-  );
 
-  res.json({
-    status: 200,
-    message: "Successfully found contacts!",
-    data: contacts,
-  });
-};
+    const contact = await getAllContactsByID(contactId, userId);
 
-export const getContactById = async (req, res) => {
-  const { contactId } = req.params;
-  const userId = req.user._id;
+    if (!contact) {
+      throw createHttpError(404, 'Contact not found');
+    }
 
-  const contact = await contactsService.getContact({ _id: contactId, userId });
-  if (!contact) throw createError(404, 'Contact not found');
-
-  res.json({
-    status: 200,
-    message: "Successfully fetched a contact!",
-    data: contact,
-  });
-};
-
-export const createContact = async (req, res) => {
-  const { name, email, phoneNumber, contactType, isFavourite } = req.body;
-  const userId = req.user._id;
-
-  const photoPath = req.file ? req.file.path : null;
-
-  const newContact = await contactsService.addContact({
-    name,
-    email,
-    phoneNumber,
-    contactType,
-    isFavourite,
-    photo: photoPath,
-    user: req.user._id,
-  });
-
-  res.status(201).json({
-    status: 201,
-    message: "Successfully created a contact!",
-    data: newContact,
-  });
-};
-
-export const updateContact = async (req, res) => {
-  const { contactId } = req.params;
-  const updates = req.body;
-  const userId = req.user._id;
-
-  if (!mongoose.Types.ObjectId.isValid(contactId)) {
-    throw createError(400, 'Invalid contact ID');
+    res.status(200).json({
+      status: 200,
+      message: `Successfully found contact with id ${contactId}!`,
+      data: contact,
+    });
+  } catch (err) {
+    next(err);
   }
-
-  if (req.file) {
-    updates.photo = req.file.path;
-  }
-
-  const updated = await contactsService.patchContact(contactId, updates, userId);
-  if (!updated) {
-    throw createError(404, 'Contact not found or not owned by user');
-  }
-
-  res.status(200).json({
-    status: 200,
-    message: 'Successfully patched a contact!',
-    data: updated,
-  });
 };
 
-export const deleteContact = async (req, res) => {
-  const { contactId } = req.params;
-  const userId = req.user._id;
+export const createContactController = async (req, res, next) => {
+  try {
+    const { name, phoneNumber, contactType } = req.body;
+    if (!name || !phoneNumber || !contactType) {
+      throw createHttpError(
+        400,
+        'Missing required fields: name, phoneNumber, or contactType',
+      );
+    }
 
-  const removed = await contactsService.removeContact(contactId, userId);
-  if (!removed) throw createError(404, 'Contact not found');
+    const userId = req.user._id;
+    let photoUrl;
 
-  res.status(204).send();
-};  
+    if (req.file) {
+      if (getEnvVar('ENABLE_CLOUDINARY') === 'true') {
+        photoUrl = await saveFileToCloudinary(req.file);
+      } else {
+        photoUrl = await saveFileToUploadDir(req.file);
+      }
+    }
+
+    const contactData = {
+      name,
+      phoneNumber,
+      contactType,
+      photo: photoUrl,
+    };
+
+    const contact = await createContact(contactData, userId);
+
+    res.status(201).json({
+      status: 201,
+      message: `Successfully created a contact!`,
+      data: contact,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteContactController = async (req, res, next) => {
+  try {
+    const { contactId } = req.params;
+    const userId = req.user._id;
+
+    if (!mongoose.Types.ObjectId.isValid(contactId)) {
+      throw createHttpError(400, 'Invalid contact ID');
+    }
+
+    const contact = await deleteContact(contactId, userId);
+
+    if (!contact) {
+      throw createHttpError(404, 'Contact not found');
+    }
+
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const patchContactController = async (req, res, next) => {
+  try {
+    const { contactId } = req.params;
+    const photo = req.file;
+    const userId = req.user._id;
+
+    let photoUrl;
+
+    if (photo) {
+      if (getEnvVar('ENABLE_CLOUDINARY') === 'true') {
+        photoUrl = await saveFileToCloudinary(photo);
+      } else {
+        photoUrl = await saveFileToUploadDir(photo);
+      }
+    }
+
+    const updatedData = {
+      ...req.body,
+      ...(photoUrl && { photo: photoUrl }),
+    };
+
+    const result = await updateContact(contactId, updatedData, userId);
+
+    if (!result) {
+      throw createHttpError(404, 'Contact not found');
+    }
+
+    res.json({
+      status: 200,
+      message: `Successfully patched a contact!`,
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

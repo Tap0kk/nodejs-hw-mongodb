@@ -1,54 +1,35 @@
 {
   "name": "nodejs-hw-mongodb",
   "version": "1.0.0",
+  "description": "nodejs-hw-mongodb",
   "type": "module",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "lint": "eslint .",
-    "build": "npm install",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/index.js"
   },
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
-  },
-  "keywords": [
-    "nodejs",
-    "mongodb",
-    "contacts-api"
-  ],
-  "author": "Dmytro Molodyk <deman2805@gmail.com>",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
-  "description": "Contacts API with MongoDB and Node.js",
-  "devDependencies": {
-    "eslint": "^8.56.0",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-n": "^16.6.2",
-    "eslint-plugin-promise": "^6.1.1",
-    "nodemon": "^3.1.9",
-    "pino-pretty": "^13.0.0"
-  },
   "dependencies": {
-    "bcryptjs": "^3.0.2",
-    "cloudinary": "^1.41.3",
+    "bcrypt": "^6.0.0",
+    "cloudinary": "^2.6.1",
     "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
+    "handlebars": "^4.7.8",
     "http-errors": "^2.0.0",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
-    "mongodb": "^6.15.0",
-    "mongoose": "^8.13.1",
-    "morgan": "^1.10.0",
-    "multer": "^1.4.5-lts.2",
-    "multer-storage-cloudinary": "^4.0.0",
-    "nodemailer": "^6.10.1",
-    "path-to-regexp": "^8.2.0",
-    "pino": "^9.6.0",
-    "pino-http": "^10.4.0"
+    "mongoose": "^8.14.1",
+    "multer": "^2.0.0",
+    "nodemailer": "^7.0.3",
+    "pino": "^8.14.1",
+    "pino-http": "^10.4.0",
+    "pino-pretty": "^10.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.26.0",
+    "eslint": "^9.26.0",
+    "nodemon": "^3.1.10"
   }
 }
