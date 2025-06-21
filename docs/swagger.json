@@ -30,7 +30,7 @@
     }
   ],
   "paths": {
-    "/contacts": {
+    "api/contacts": {
       "get": {
         "tags": [
           "Contacts"
@@ -212,7 +212,7 @@
         }
       }
     },
-    "/contacts/{contactId}": {
+    "api/contacts/{contactId}": {
       "get": {
         "tags": [
           "Contacts"
