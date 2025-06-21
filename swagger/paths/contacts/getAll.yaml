@@ -69,9 +69,26 @@ responses:
               type: string
               example: Successfully found contacts!
             data:
-              type: array
-              items:
-                $ref: '../../components/schemas/contact.yaml#/ContactResponse'
+              type: object
+  required:
+    - contacts
+    - total
+    - page
+    - limit
+  properties:
+    contacts:
+      type: array
+      items:
+        $ref: '../../components/schemas/contact.yaml#/ContactResponse'
+    total:
+      type: integer
+      example: 30
+    page:
+      type: integer
+      example: 1
+    limit:
+      type: integer
+      example: 10
   '401':
     $ref: '../../components/responses/401.yaml'
   '500':
