@@ -21,13 +21,13 @@ servers:
     description: Local development server
 
 paths:
-  api/contacts:
+  /api/contacts:
     get:
       $ref: '../swagger/paths/contacts/getAll.yaml'
     post:
       $ref: '../swagger/paths/contacts/post.yaml'
 
-  api/contacts/{contactId}:
+  /api/contacts/{contactId}:
     get:
       $ref: '../swagger/paths/contacts/{contactId}/get.yaml'
     patch:
