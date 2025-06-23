@@ -1,31 +1,69 @@
 tags:
   - Contacts
-summary: Update a contact by id
+summary: Update contact by id
 operationId: updateContact
-description: Оновлює інформацію про існуючий контакт за його ID.
+description: Update contact by id
 security:
   - bearerAuth: []
 parameters:
   - in: path
     name: contactId
     required: true
-    description: Унікальний ідентифікатор контакту
     schema:
       type: string
-      example: '60d21b4667d0d8992e610c85'
+      example: 683608896e76a8c59c1c2b29
 requestBody:
-  required: true
   content:
     multipart/form-data:
       schema:
-        $ref: '../../../components/schemas/contact.yaml#/ContactUpdateRequest'
+        type: object
+        properties:
+          name:
+            type: string
+            description: New Contact Name
+            example: Viktor Pavlik
+          phoneNumber:
+            type: string
+            description: New contact phone phone number
+            example: +380980000001
+          email:
+            type: string
+            description: new contact email
+            example: examp123@google.ua
+          isFavourite:
+            type: boolean
+            description: Is contact in favourite list
+            example: true
+            default: false
+          contactType:
+            type: string
+            description: Contact type
+            enum: ['work', 'home', 'personal']
+            example: work
+          photo:
+            type: string
+            format: binary
+            description: Contact photo
 responses:
   '200':
-    description: Контакт успішно оновлено
+    description: Successfully patched a contact!
     content:
       application/json:
         schema:
-          $ref: '../../../components/schemas/contact.yaml#/ContactResponse'
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully patched a contact!
+            data:
+              $ref: ../../../components/schemas/contact.yaml
   '400':
     $ref: '../../../components/responses/400.yaml'
   '401':
