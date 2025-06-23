@@ -22,27 +22,22 @@ export const getContactsController = async (req, res, next) => {
 
     const userId = req.user._id;
 
-    const {contacts, total} = await getAllContacts({
-      page,
-      perPage,
-      sortBy,
-      sortOrder,
-      filter,
-      userId,
-    });
+    const contacts = await getAllContacts({
+    page,
+    perPage,
+    sortBy,
+    sortOrder,
+    filter,
+    userId: req.user._id,
+  });
 
-    const totalPages = Math.ceil(total / perPage);
+    //const totalPages = Math.ceil(total / perPage);
 
-    res.json({
-      status: 200,
-      message: 'Successfully found contacts!',
-      data: {
-        contacts,
-        total,
-        page: Number(page),
-        perPage: Number(perPage),
-        totalPages,
-      },
+    res.status(200).json({
+    status: 200,
+    message: 'Successfully found contacts!',
+    data: contacts,
+  });
     });
   } catch (err) {
     next(err);
