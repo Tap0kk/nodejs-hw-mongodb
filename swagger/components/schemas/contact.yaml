@@ -1,56 +1,100 @@
-type: object
-required:
-  - _id
-  - name
-  - phoneNumber
-  - email
-  - contactType
-  - userId
-  - createdAt
-  - updateAt
-properties:
-  _id:
-    type: string
-    description: Contact id
-    example: 683608896e76a8c59c1c2b27
-  name:
-    type: string
-    description: Contact name
-    example: Maksym Maksymov
-  phoneNumber:
-    type: string
-    description: Telephone number of contact
-    example: +380445373737
-  email:
-    type: string
-    description: Email of contact
-    example: example123@gmail.ua
-  isFavourite:
-    type: boolean
-    description: This contaact is favourite?
-    example: false
-    default: false
-  contactType:
-    type: string
-    description: Type of contact
-    enum: ['work', 'home', 'personal']
-    example: work
-  userId:
-    type: string
-    description: Contact user id
-    example: 683608896e76a7779c1c2b27
-  photo:
-    type: string
-    format: url
-    description: Contact photo url
-    example: https://res.cloudinary.com/dwm4nmcrg/image/upload/v1749304763/dh967hnyuoroqzynllbh.jpg
-  createdAt:
-    type: string
-    format: date-time
-    description: Contact created at
-    example: 2025-05-31T14:28:42.960+00:00
-  updatedAt:
-    type: string
-    format: date-time
-    description: Contact created at
-    example: 2025-06-01T14:28:42.960+00:00
+ContactRequest:
+  type: object
+  properties:
+    name:
+      type: string
+      example: 'Andriy Pavlenko'
+    phoneNumber:
+      type: string
+      example: '+380000000003'
+    email:
+      type: string
+      format: email
+      example: 'dmytro3@example.com'
+    contactType:
+      type: string
+      enum: [personal, work, family, other, home]
+      example: 'home'
+    isFavourite:
+      type: boolean
+      example: false
+    photo:
+      type: string
+      format: binary
+      description: 'Contact photo upload'
+  required:
+    - name
+    - phoneNumber
+    - contactType
+  additionalProperties: false
+
+ContactUpdateRequest:
+  type: object
+  properties:
+    name:
+      type: string
+      example: 'Andriy Pavlenko'
+    phoneNumber:
+      type: string
+      example: '+380000000003'
+    email:
+      type: string
+      format: email
+      example: 'dmytro3@example.com'
+    contactType:
+      type: string
+      enum: [personal, work, family, other, home]
+      example: 'home'
+    isFavourite:
+      type: boolean
+      example: true
+    photo:
+      type: string
+      format: binary
+      description: 'Contact photo upload'
+  additionalProperties: false
+
+ContactResponse:
+  type: object
+  properties:
+    _id:
+      type: string
+      example: '6818d350afed062c6892fe2c'
+    name:
+      type: string
+      example: 'Andriy Pavlenko'
+    phoneNumber:
+      type: string
+      example: '+380000000003'
+    email:
+      type: string
+      format: email
+      example: 'dmytro3@example.com'
+    isFavourite:
+      type: boolean
+      example: false
+    contactType:
+      type: string
+      enum: [personal, work, family, other, home]
+      example: 'home'
+    photo:
+      type: string
+      format: uri
+      example: 'https://res.cloudinary.com/demo/image/upload/v1621234567/photo.jpg'
+    createdAt:
+      type: string
+      format: date-time
+      example: '2024-05-08T16:12:14.954168'
+    updatedAt:
+      type: string
+      format: date-time
+      example: '2024-05-08T16:12:14.954170'
+  required:
+    - _id
+    - name
+    - phoneNumber
+    - email
+    - isFavourite
+    - contactType
+    - createdAt
+    - updatedAt
