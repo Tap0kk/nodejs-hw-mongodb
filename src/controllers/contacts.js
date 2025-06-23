@@ -38,7 +38,6 @@ export const getContactsController = async (req, res, next) => {
     message: 'Successfully found contacts!',
     data: contacts,
   });
-    });
   } catch (err) {
     next(err);
   }
