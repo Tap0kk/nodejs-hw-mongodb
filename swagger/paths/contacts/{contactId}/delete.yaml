@@ -1,26 +1,39 @@
 tags:
   - Contacts
-summary: Delete a contact by id
+summary: Delete contact by id
 operationId: deleteContact
-description: Видаляє контакт за заданим ідентифікатором.
+description: Delete contact by id
 security:
   - bearerAuth: []
 parameters:
   - in: path
     name: contactId
     required: true
-    description: Унікальний ідентифікатор контакту
     schema:
       type: string
-      example: '60d21b4667d0d8992e610c85'
+      example: 683608896e76a8c59c1c2b29
 responses:
   '204':
-    description: Контакт успішно видалено (без тіла відповіді)
+    description: Successfully deleted contact
   '400':
-    $ref: '../../../components/responses/400.yaml'
+    $ref: ../../../components/responses/400.yaml
   '401':
-    $ref: '../../../components/responses/401.yaml'
+    $ref: ../../../components/responses/401.yaml
   '404':
-    $ref: '../../../components/responses/404.yaml'
+    description: Contact not found
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+          properties:
+            status:
+              type: integer
+              example: 404
+            message:
+              type: string
+              example: Contact not found
   '500':
-    $ref: '../../../components/responses/500.yaml'
+    $ref: ../../../components/responses/500.yaml
