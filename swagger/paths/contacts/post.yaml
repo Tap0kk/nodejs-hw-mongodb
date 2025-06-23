@@ -1,19 +1,51 @@
 tags:
   - Contacts
-summary: Create a new contact
+summary: Create contact
 operationId: createContact
-description: Створює новий контакт для авторизованого користувача.
+description: Create contact
 security:
   - bearerAuth: []
+# опис body
 requestBody:
-  required: true
   content:
     multipart/form-data:
       schema:
-        $ref: '../../components/schemas/contact.yaml#/ContactRequest'
+        type: object
+        required:
+          - name
+          - phoneNumber
+          - contactType
+        properties:
+          name:
+            type: string
+            description: Contact name
+            example: Maksym Maksymov
+          phoneNumber:
+            type: string
+            description: Contact phone
+            example: +380671234567
+          contactType:
+            type: string
+            description: Type of contacts
+            enum: ['work', 'home', 'personal']
+            example: home
+          email:
+            type: string
+            description: Contact email
+            example: example23@gmail.ua
+          isFavourite:
+            type: boolean
+            description: Contact is favourite?
+            example: true
+            default: false
+          photo:
+            type: string
+            format: binary
+            description: Contact photo
+# опис відповіді
 responses:
   '201':
-    description: Контакт успішно створено
+    description: Create a contact
     content:
       application/json:
         schema:
@@ -28,9 +60,9 @@ responses:
               example: 201
             message:
               type: string
-              example: Contact created successfully
+              example: Successfully created a contact!
             data:
-              $ref: '../../components/schemas/contact.yaml#/ContactResponse'
+              $ref: ../../components/schemas/contact.yaml
   '400':
     $ref: '../../components/responses/400.yaml'
   '401':
