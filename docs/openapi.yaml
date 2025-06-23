@@ -15,19 +15,19 @@ tags:
     description: Auth operations.
 
 servers:
-  - url: https://nodejs-hw-mongodb-d50h.onrender.com/api
+  - url: https://nodejs-hw-mongodb-d50h.onrender.com
     description: Production server
-  - url: http://localhost:3000/api
+  - url: http://localhost:3000
     description: Local development server
 
 paths:
-  /api/contacts:
+  /contacts:
     get:
       $ref: '../swagger/paths/contacts/getAll.yaml'
     post:
       $ref: '../swagger/paths/contacts/post.yaml'
 
-  /api/contacts/{contactId}:
+  /contacts/{contactId}:
     get:
       $ref: '../swagger/paths/contacts/{contactId}/get.yaml'
     patch:
