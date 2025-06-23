@@ -15,8 +15,8 @@ export async function getAllContacts({
   const filters = { ...filter, userId };
 
   const [totalItems, contacts] = await Promise.all([
-    Contact.countDocuments(filters),
-    Contact.find(filters)
+    ContactCollection.countDocuments(filters),
+    ContactCollection.find(filters)
       .sort({ [sortBy]: sortOrder })
       .skip(skip)
       .limit(perPage),
